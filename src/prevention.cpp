@@ -10,7 +10,7 @@ FILE* open_raw_video_file(std::string file_name) {
     FILE *fd = fopen((char*) file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error, file %s does not exists\n", (char*) file_name.c_str());
+        printf("Error, file %s does not exist\n", (char*) file_name.c_str());
         exit(-1);
     }
 
@@ -21,7 +21,7 @@ int get_number_of_frames(FILE *fd, camParams_t camera_parameters) {
 
     if (fd == NULL)
     {
-        printf("Error, fd does not exists\n");
+        printf("Error, fd does not exist\n");
         exit(-1);
     }
 
@@ -35,7 +35,7 @@ int get_number_of_frames(FILE *fd, camParams_t camera_parameters) {
 cv::Mat read_image_from_video(FILE *fd, int n_frame, camParams_t camera_parameters) {
     if (fd == NULL)
     {
-        printf("Error, fd does not exists\n");
+        printf("Error, fd does not exist\n");
         exit(-1);
     }
 
@@ -69,7 +69,7 @@ camParams_t read_intrinsic_camera_calibration_file(std::string file_name) {
 
     if (fd == NULL)
     {
-        printf("Error, file %s does not exists\n", (char*) file_name.c_str());
+        printf("Error, file %s does not exist\n", (char*) file_name.c_str());
         exit(-1);
     }
 
@@ -121,7 +121,7 @@ cv::Mat read_extrinsic_camera_calibration_file(std::string file_name) {
     // Open the file with the information about the stereo and correlation parameters.
     if (fd == NULL)
     {
-        printf("File hasn't been opened.\n");
+        printf("File has not been opened\n");
         exit(-1);
     }
 
@@ -446,7 +446,7 @@ FILE* open_velodyne_video_file(std::string file_name) {
     FILE *fd = fopen((char*) file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error, file %s does not exists\n", (char*) file_name.c_str());
+        printf("Error, file %s does not exist\n", (char*) file_name.c_str());
         exit(-1);
     }
 
@@ -456,7 +456,7 @@ FILE* open_velodyne_video_file(std::string file_name) {
 int get_number_of_clouds(FILE *fd) {
     if (fd == NULL)
     {
-        printf("Error, fd does not exists\n");
+        printf("Error, fd does not exist\n");
         exit(-1);
     }
 
