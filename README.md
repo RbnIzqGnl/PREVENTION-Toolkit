@@ -19,4 +19,4 @@ To test the program type the following:
 
 
 Use WASD to move forward and backward along the video.
-Numbers from 1 to 5 (not in the numeric pad) enble/disable visual options.
+Numbers from 1 to 5 (not in the numeric pad) enable/disable visual options.
