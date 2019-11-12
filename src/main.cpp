@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
     camParams_t camera1_parameters = read_intrinsic_camera_calibration_file(camera1_intrinsic_calibration_file);
     cv::Mat camera_extrinsic_RT = read_extrinsic_camera_calibration_file(camera1_extrinsic_calibration_file);
     cv::Mat velodyne_extrinsic_RT = read_extrinsic_calibration_file(velodyne_extrinsic_calibration_file);
-    cv::Mat redar1_extrinsic_RT = read_extrinsic_calibration_file(radar1_extrinsic_calibration_file);
-    cv::Mat redar2_extrinsic_RT = read_extrinsic_calibration_file(radar2_extrinsic_calibration_file);
-    cv::Mat redar3_extrinsic_RT = read_extrinsic_calibration_file(radar3_extrinsic_calibration_file);
+    cv::Mat radar1_extrinsic_RT = read_extrinsic_calibration_file(radar1_extrinsic_calibration_file);
+    cv::Mat radar2_extrinsic_RT = read_extrinsic_calibration_file(radar2_extrinsic_calibration_file);
+    cv::Mat radar3_extrinsic_RT = read_extrinsic_calibration_file(radar3_extrinsic_calibration_file);
 
-    FullExtrinsicCalibration extrinsic_calibrations = compute_full_extrinsic_calibrations(camera_extrinsic_RT, velodyne_extrinsic_RT, redar1_extrinsic_RT, redar2_extrinsic_RT, redar3_extrinsic_RT);
+    FullExtrinsicCalibration extrinsic_calibrations = compute_full_extrinsic_calibrations(camera_extrinsic_RT, velodyne_extrinsic_RT, radar1_extrinsic_RT, radar2_extrinsic_RT, radar3_extrinsic_RT);
     
     // Load logs
     CameraLog camera1_log = read_camera_log(camera1_log_file);
@@ -136,7 +136,6 @@ int main(int argc, char** argv) {
             draw_radar_map(vehicle_pitch_corrected_radar2_cloud);
         }
         
-        
         if(represent_detections)
             draw_cnn_detections(img, &camera1_cnn_detections, frame, 0.5);
 
@@ -146,7 +145,7 @@ int main(int argc, char** argv) {
         if(represent_lanechanges)
             draw_lane_change_events(img, &camera1_lane_changes, frame);
         
-
+        
         cv::imshow("BGR undistorted", img);
         printf("Frame %d -- pitch/roll[rad] %+08.5f/%+08.5f \n", frame, pitch, roll);
         q = cv::waitKey(0);
