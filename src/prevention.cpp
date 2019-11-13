@@ -210,7 +210,7 @@ CameraLog read_camera_log(std::string file_name) {
     }
 
     fclose(fd);
-    printf("Manual labels in file %s have been correctly read\n", (char*) file_name.c_str());
+    printf("Camera logs in file %s have been correctly read\n", (char*) file_name.c_str());
 
     return camera_log;
 }
