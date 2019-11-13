@@ -6,18 +6,20 @@
 
 #include "prevention.h"
 
-FILE* open_raw_video_file(std::string file_name) {
-    FILE *fd = fopen((char*) file_name.c_str(), "r");
+FILE *open_raw_video_file(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error, file %s does not exist\n", (char*) file_name.c_str());
+        printf("Error, file %s does not exist\n", (char *)file_name.c_str());
         exit(-1);
     }
 
     return fd;
 }
 
-int get_number_of_frames(FILE *fd, camParams_t camera_parameters) {
+int get_number_of_frames(FILE *fd, camParams_t camera_parameters)
+{
 
     if (fd == NULL)
     {
@@ -32,7 +34,8 @@ int get_number_of_frames(FILE *fd, camParams_t camera_parameters) {
     return frames;
 }
 
-cv::Mat read_image_from_video(FILE *fd, int n_frame, camParams_t camera_parameters) {
+cv::Mat read_image_from_video(FILE *fd, int n_frame, camParams_t camera_parameters)
+{
     if (fd == NULL)
     {
         printf("Error, fd does not exist\n");
@@ -41,8 +44,8 @@ cv::Mat read_image_from_video(FILE *fd, int n_frame, camParams_t camera_paramete
 
     cv::Mat img_raw(camera_parameters.rows, camera_parameters.cols, CV_8UC1);
 
-    unsigned image_size = sizeof (unsigned char) * camera_parameters.cols * camera_parameters.rows;
-    unsigned long int offset = (unsigned long int) image_size * (unsigned long int) n_frame;
+    unsigned image_size = sizeof(unsigned char) * camera_parameters.cols * camera_parameters.rows;
+    unsigned long int offset = (unsigned long int)image_size * (unsigned long int)n_frame;
     if (fseek(fd, offset, SEEK_SET) != 0)
     {
         printf("Error while moving to frame %d in camera video\n", n_frame);
@@ -64,12 +67,13 @@ cv::Mat read_image_from_video(FILE *fd, int n_frame, camParams_t camera_paramete
     return img_und;
 }
 
-camParams_t read_intrinsic_camera_calibration_file(std::string file_name) {
-    FILE *fd = fopen((char*) file_name.c_str(), "r");
+camParams_t read_intrinsic_camera_calibration_file(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
 
     if (fd == NULL)
     {
-        printf("Error, file %s does not exist\n", (char*) file_name.c_str());
+        printf("Error, file %s does not exist\n", (char *)file_name.c_str());
         exit(-1);
     }
 
@@ -94,7 +98,6 @@ camParams_t read_intrinsic_camera_calibration_file(std::string file_name) {
     }
     printf("Intrinsic matrix %lf, %lf, %lf, %lf, %lf\n", ret.fx, ret.sk, ret.cx, ret.fy, ret.cy);
 
-
     // Read distortion parameters.
     ret_fs = fscanf(fd, "DistortionCoefficients %lf %lf %lf %lf %lf\n", &(ret.k1), &(ret.k2), &(ret.k3), &(ret.p1), &(ret.p2));
     if (ret_fs != 5)
@@ -115,8 +118,9 @@ camParams_t read_intrinsic_camera_calibration_file(std::string file_name) {
     return ret;
 }
 
-cv::Mat read_extrinsic_camera_calibration_file(std::string file_name) {
-    FILE* fd = fopen(file_name.c_str(), "r");
+cv::Mat read_extrinsic_camera_calibration_file(std::string file_name)
+{
+    FILE *fd = fopen(file_name.c_str(), "r");
 
     // Open the file with the information about the stereo and correlation parameters.
     if (fd == NULL)
@@ -128,12 +132,11 @@ cv::Mat read_extrinsic_camera_calibration_file(std::string file_name) {
     int ret_fs = 0;
     cv::Mat RT = cv::Mat::eye(4, 4, CV_64FC1);
 
-
     // Reads R.
     ret_fs = fscanf(fd, "R %lf %lf %lf %lf  %lf %lf %lf %lf %lf\n",
-            &(RT.at<double>(0, 0)), &(RT.at<double>(0, 1)), &(RT.at<double>(0, 2)),
-            &(RT.at<double>(1, 0)), &(RT.at<double>(1, 1)), &(RT.at<double>(1, 2)),
-            &(RT.at<double>(2, 0)), &(RT.at<double>(2, 1)), &(RT.at<double>(2, 2)));
+                    &(RT.at<double>(0, 0)), &(RT.at<double>(0, 1)), &(RT.at<double>(0, 2)),
+                    &(RT.at<double>(1, 0)), &(RT.at<double>(1, 1)), &(RT.at<double>(1, 2)),
+                    &(RT.at<double>(2, 0)), &(RT.at<double>(2, 1)), &(RT.at<double>(2, 2)));
     //RT.at<double>(3, 3) = 1.0;
 
     if (ret_fs != 9)
@@ -150,7 +153,8 @@ cv::Mat read_extrinsic_camera_calibration_file(std::string file_name) {
         exit(-1);
     }
 
-    std::cout << "Camera extrinsic calibration" << std::endl << RT << std::endl;
+    std::cout << "Camera extrinsic calibration" << std::endl
+              << RT << std::endl;
 
     // Closes the file.
     fclose(fd);
@@ -158,8 +162,9 @@ cv::Mat read_extrinsic_camera_calibration_file(std::string file_name) {
     return RT;
 }
 
-cv::Mat read_extrinsic_calibration_file(std::string file_name) {
-    FILE *fd = fopen((char *) file_name.c_str(), "r");
+cv::Mat read_extrinsic_calibration_file(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
         printf("Error opening file %s\n", file_name.c_str());
@@ -174,7 +179,7 @@ cv::Mat read_extrinsic_calibration_file(std::string file_name) {
         {
             if (fscanf(fd, "%lf", &val) != 1)
             {
-                printf("Error reading calibration parameters in %s\n", (char*) file_name.c_str());
+                printf("Error reading calibration parameters in %s\n", (char *)file_name.c_str());
                 exit(-1);
             }
             RT.at<double>(r, c) = val;
@@ -182,50 +187,57 @@ cv::Mat read_extrinsic_calibration_file(std::string file_name) {
     // Closes the file
     fclose(fd);
 
-    std::cout << "Extrinsic calibration" << std::endl << RT << std::endl;
+    std::cout << "Extrinsic calibration" << std::endl
+              << RT << std::endl;
 
     return RT;
 }
 
-CameraLog read_camera_log(std::string file_name) {
-    FILE *fd = fopen((char *) file_name.c_str(), "r");
+CameraLog read_camera_log(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
         printf("Error opening file %s\n", file_name.c_str());
         exit(-1);
     }
 
-
     CameraLog camera_log;
     cam_entry_t entry;
 
-    while (feof(fd) == 0)
+    fseek(fd, 0, SEEK_END);
+    int size = ftell(fd);
+    if (size != 0)
     {
-        if (fscanf(fd, "%d %d %lu %lu\n", &(entry.cloud), &(entry.frame), &(entry.t_0), &(entry.t_1)) != 4)
+        fseek(fd, 0, SEEK_SET);
+        while (feof(fd) == 0)
         {
-            printf("Error in function read_manual_labels, reading file %s\n", (char *) file_name.c_str());
-            exit(-1);
+            if (fscanf(fd, "%d %d %lu %lu\n", &(entry.cloud), &(entry.frame), &(entry.t_0), &(entry.t_1)) != 4)
+            {
+                printf("Error in function read_manual_labels, reading file %s\n", (char *)file_name.c_str());
+                exit(-1);
+            }
+            camera_log.push_back(entry);
         }
-        camera_log.push_back(entry);
     }
 
     fclose(fd);
-    printf("Camera logs in file %s have been correctly read\n", (char*) file_name.c_str());
+    printf("Camera logs in file %s have been correctly read\n", (char *)file_name.c_str());
 
     return camera_log;
 }
 
-CNN_detections read_cnn_detections(std::string file_name) {
+CNN_detections read_cnn_detections(std::string file_name)
+{
 
-    FILE *f = fopen((char *) file_name.c_str(), "r");
-    if (f == NULL)
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
+    if (fd == NULL)
     {
-        printf("Error while reading %s\n", (char *) file_name.c_str());
+        printf("Error while reading %s\n", (char *)file_name.c_str());
         exit(-1);
     }
 
     int fault = 0;
-
 
     CNN_detections detections;
     detections.clear();
@@ -233,46 +245,53 @@ CNN_detections read_cnn_detections(std::string file_name) {
     detection_t aux;
     int nPoints = 0;
 
-    while (feof(f) == 0 && fault == 0)
+    fseek(fd, 0, SEEK_END);
+    int size = ftell(fd);
+    if (size != 0)
     {
-        if (fscanf(f, "%d %d %d %f %f %f %f %f %d", &aux.frame, &aux.id, &aux.category, &aux.x0, &aux.y0, &aux.xf, &aux.yf, &aux.conf, &nPoints) != 9)
+        fseek(fd, 0, SEEK_SET);
+        while (feof(fd) == 0 && fault == 0)
         {
-            printf("Error while reading frame, id, category, x0, y0, xf, yf, or confidence\n");
-            exit(-1);
-        }
-
-        aux.contour.clear();
-        cv::Point paux;
-
-        for (int j = 0; j < nPoints; j++)
-        {
-            if (fscanf(f, " %d %d", &paux.x, &paux.y) != 2)
+            if (fscanf(fd, "%d %d %d %f %f %f %f %f %d", &aux.frame, &aux.id, &aux.category, &aux.x0, &aux.y0, &aux.xf, &aux.yf, &aux.conf, &nPoints) != 9)
             {
-                printf("Error importing contour points from %s at frame %d\n", (char*) file_name.c_str(), aux.frame);
+                printf("Error while reading frame, id, category, x0, y0, xf, yf, or confidence\n");
                 exit(-1);
             }
-            aux.contour.push_back(paux);
-        }
 
-        int n = fscanf(f, "\n");
-        if (n != 0)
-        {
-            printf("Return not read from file %s\n", (char*) file_name.c_str());
-            fault = 1;
-        }
-        detections.push_back(aux);
+            aux.contour.clear();
+            cv::Point paux;
 
+            for (int j = 0; j < nPoints; j++)
+            {
+                if (fscanf(fd, " %d %d", &paux.x, &paux.y) != 2)
+                {
+                    printf("Error importing contour points from %s at frame %d\n", (char *)file_name.c_str(), aux.frame);
+                    exit(-1);
+                }
+                aux.contour.push_back(paux);
+            }
+
+            int n = fscanf(fd, "\n");
+            if (n != 0)
+            {
+                printf("Return not read from file %s\n", (char *)file_name.c_str());
+                fault = 1;
+            }
+            detections.push_back(aux);
+        }
     }
 
-    printf("Detections in file %s have been correctly read\n", (char*) file_name.c_str());
+    fclose(fd);
+    printf("Detections in file %s have been correctly read\n", (char *)file_name.c_str());
 
     return detections;
 }
 
-void draw_cnn_detections(cv::Mat img, CNN_detections *detections, int frame, int min_conf) {
+void draw_cnn_detections(cv::Mat img, CNN_detections *detections, int frame, int min_conf)
+{
 
     cv::Scalar color(0, 0, 255);
-    std::vector < std::vector < cv::Point2i> > contours;
+    std::vector<std::vector<cv::Point2i>> contours;
 
     for (uint i = 0; i < detections->size(); i++)
         if (detections->at(i).frame == frame)
@@ -293,136 +312,169 @@ void draw_cnn_detections(cv::Mat img, CNN_detections *detections, int frame, int
                 }
 }
 
-Labels read_manual_labels(std::string file_name) {
+Labels read_manual_labels(std::string file_name)
+{
 
-    FILE *fd = fopen((char *) file_name.c_str(), "r");
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error while reading %s\n", (char *) file_name.c_str());
+        printf("Error while reading %s\n", (char *)file_name.c_str());
         exit(-1);
     }
 
     Labels detections;
     entry_t aux;
-    while (feof(fd) == 0)
+
+    fseek(fd, 0, SEEK_END);
+    int size = ftell(fd);
+    if (size != 0)
     {
-        if (fscanf(fd, "%e %e %e %e %e %e %e %e\n", &(aux.frame), &(aux.id), &(aux.x), &(aux.y), &(aux.w), &(aux.h), &(aux.xc), &(aux.yc)) != 8)
+        fseek(fd, 0, SEEK_SET);
+        while (feof(fd) == 0)
         {
-            printf("Error in function read_manual_labels, reading file %s\n", (char *) file_name.c_str());
-            exit(-1);
+            if (fscanf(fd, "%e %e %e %e %e %e %e %e\n", &(aux.frame), &(aux.id), &(aux.x), &(aux.y), &(aux.w), &(aux.h), &(aux.xc), &(aux.yc)) != 8)
+            {
+                printf("Error in function read_manual_labels, reading file %s\n", (char *)file_name.c_str());
+                exit(-1);
+            }
+            detections.push_back(aux);
         }
-        detections.push_back(aux);
     }
 
     fclose(fd);
-    printf("Manual labels in file %s have been correctly read\n", (char*) file_name.c_str());
+    printf("Manual labels in file %s have been correctly read\n", (char *)file_name.c_str());
 
     return detections;
 }
 
-void draw_manual_labels(cv::Mat img, Labels *detections, int frame) {
+void draw_manual_labels(cv::Mat img, Labels *detections, int frame)
+{
     cv::Scalar color(255, 0, 0);
 
     for (uint i = 0; i < detections->size(); i++)
         if (detections->at(i).frame == frame)
         {
             char id[10];
-            snprintf(id, 10, "%d", (int) detections->at(i).id);
-            cv::Point pt((int) detections->at(i).x, (int) detections->at(i).y);
-            cv::Rect rect((int) detections->at(i).x, (int) detections->at(i).y, (int) detections->at(i).w, (int) detections->at(i).h);
+            snprintf(id, 10, "%d", (int)detections->at(i).id);
+            cv::Point pt((int)detections->at(i).x, (int)detections->at(i).y);
+            cv::Rect rect((int)detections->at(i).x, (int)detections->at(i).y, (int)detections->at(i).w, (int)detections->at(i).h);
 
             cv::putText(img, id, pt, cv::FONT_HERSHEY_COMPLEX, 1, color, 1);
             cv::rectangle(img, rect, color, 1, 1);
         }
 }
 
-LaneChangeEvents read_lane_change_events(std::string file_name) {
-    FILE *fd = fopen((char *) file_name.c_str(), "r");
+LaneChangeEvents read_lane_change_events(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error while reading %s\n", (char *) file_name.c_str());
+        printf("Error while reading %s\n", (char *)file_name.c_str());
         exit(-1);
     }
 
     LaneChangeEvents lane_change_events;
     event_t event;
-    while (feof(fd) == 0)
+
+    fseek(fd, 0, SEEK_END);
+    int size = ftell(fd);
+    if (size != 0)
     {
-        if (fscanf(fd, "%d %d %d %d %d %d %d\n",  &(event.id_l), &(event.id_d), &(event.type), &(event.f0), &(event.fe), &(event.ff), &(event.blk)) != 7)
+        fseek(fd, 0, SEEK_SET);
+        while (feof(fd) == 0)
         {
-            printf("Error reading file %s\n", (char *) file_name.c_str());
-            exit(-1);
+            if (fscanf(fd, "%d %d %d %d %d %d %d\n", &(event.id_l), &(event.id_d), &(event.type), &(event.f0), &(event.fe), &(event.ff), &(event.blk)) != 7)
+            {
+                printf("Error reading file %s\n", (char *)file_name.c_str());
+                exit(-1);
+            }
+            lane_change_events.push_back(event);
         }
-        lane_change_events.push_back(event);
     }
 
     fclose(fd);
-    printf("Events log file %s have been correctly read\n", (char*) file_name.c_str());
+    printf("Events log file %s have been correctly read\n", (char *)file_name.c_str());
 
     return lane_change_events;
 }
 
-void draw_lane_change_events(cv::Mat img, LaneChangeEvents *lane_change_events, int frame) {
+void draw_lane_change_events(cv::Mat img, LaneChangeEvents *lane_change_events, int frame)
+{
     cv::Scalar color(255, 255, 0);
     cv::Point pt(1500, 580);
 
     for (uint i = 0; i < lane_change_events->size(); i++)
         if (lane_change_events->at(i).f0 != -1)
             if (lane_change_events->at(i).f0 <= frame)
-                if( lane_change_events->at(i).ff >= frame)
+                if (lane_change_events->at(i).ff >= frame)
                 {
                     char txt[50];
                     switch (lane_change_events->at(i).type)
                     {
-                        case 1:
-                            sprintf(txt, "cut-in by id %d", lane_change_events->at(i).id_d);
-                            break;
-                        case 2: sprintf(txt, "cut-out by id %d", lane_change_events->at(i).id_d);
-                            break;
-                        case 3: sprintf(txt, "left-ll by id %d", lane_change_events->at(i).id_d);
-                            break;
-                        case 4: sprintf(txt, "right-ll by id %d", lane_change_events->at(i).id_d);
-                            break;
-                        case 5: sprintf(txt, "hazardous by id %d", lane_change_events->at(i).id_d);
-                            break;
-                        case 6: sprintf(txt, "pedestrian by id %d", lane_change_events->at(i).id_d);
-                            break;
-                        default: sprintf(txt, "unknown by id %d", lane_change_events->at(i).id_d);
-                            break;
+                    case 1:
+                        sprintf(txt, "cut-in by id %d", lane_change_events->at(i).id_d);
+                        break;
+                    case 2:
+                        sprintf(txt, "cut-out by id %d", lane_change_events->at(i).id_d);
+                        break;
+                    case 3:
+                        sprintf(txt, "left-ll by id %d", lane_change_events->at(i).id_d);
+                        break;
+                    case 4:
+                        sprintf(txt, "right-ll by id %d", lane_change_events->at(i).id_d);
+                        break;
+                    case 5:
+                        sprintf(txt, "hazardous by id %d", lane_change_events->at(i).id_d);
+                        break;
+                    case 6:
+                        sprintf(txt, "pedestrian by id %d", lane_change_events->at(i).id_d);
+                        break;
+                    default:
+                        sprintf(txt, "unknown by id %d", lane_change_events->at(i).id_d);
+                        break;
                     }
                     cv::putText(img, txt, pt, cv::FONT_HERSHEY_COMPLEX, 1, color, 1);
                 }
 }
 
-GroundCoefficients read_ground_coefficients(std::string file_name) {
-    FILE *fd = fopen((char *) file_name.c_str(), "r");
+GroundCoefficients read_ground_coefficients(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error while reading %s\n", (char *) file_name.c_str());
+        printf("Error while reading %s\n", (char *)file_name.c_str());
         exit(-1);
     }
 
     GroundCoefficients ground_coefficients;
     coeffs_t coeffs;
-    while (feof(fd) == 0)
+
+    fseek(fd, 0, SEEK_END);
+    int size = ftell(fd);
+    if (size != 0)
     {
-        float a, b, c, d;
-        if (fscanf(fd, "%d %f %f %f %f\n", &(coeffs.frame), &a, &b, &c, &d) != 5)
+        fseek(fd, 0, SEEK_SET);
+        while (feof(fd) == 0)
         {
-            printf("Error reading file %s\n", (char *) file_name.c_str());
-            exit(-1);
+            float a, b, c, d;
+            if (fscanf(fd, "%d %f %f %f %f\n", &(coeffs.frame), &a, &b, &c, &d) != 5)
+            {
+                printf("Error reading file %s\n", (char *)file_name.c_str());
+                exit(-1);
+            }
+            coeffs.coeffs = cv::Vec4f(a, b, c, d);
+            ground_coefficients.push_back(coeffs);
         }
-        coeffs.coeffs = cv::Vec4f(a, b, c, d);
-        ground_coefficients.push_back(coeffs);
     }
 
     fclose(fd);
-    printf("Ground coefficients file %s have been correctly read\n", (char*) file_name.c_str());
+    printf("Ground coefficients file %s have been correctly read\n", (char *)file_name.c_str());
 
     return ground_coefficients;
 }
 
-float compute_vehicle_pitch(GroundCoefficients *ground_coefficients, int frame) {
+float compute_vehicle_pitch(GroundCoefficients *ground_coefficients, int frame)
+{
     float pitch = 0;
     for (uint i = 0; i < ground_coefficients->size(); i++)
         if (ground_coefficients->at(i).frame == frame)
@@ -432,7 +484,8 @@ float compute_vehicle_pitch(GroundCoefficients *ground_coefficients, int frame) 
     return pitch;
 }
 
-float compute_vehicle_roll(GroundCoefficients *ground_coefficients, int frame) {
+float compute_vehicle_roll(GroundCoefficients *ground_coefficients, int frame)
+{
     float roll = 0;
     for (uint i = 0; i < ground_coefficients->size(); i++)
         if (ground_coefficients->at(i).frame == frame)
@@ -442,18 +495,20 @@ float compute_vehicle_roll(GroundCoefficients *ground_coefficients, int frame) {
     return roll;
 }
 
-FILE* open_velodyne_video_file(std::string file_name) {
-    FILE *fd = fopen((char*) file_name.c_str(), "r");
+FILE *open_velodyne_video_file(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error, file %s does not exist\n", (char*) file_name.c_str());
+        printf("Error, file %s does not exist\n", (char *)file_name.c_str());
         exit(-1);
     }
 
     return fd;
 }
 
-int get_number_of_clouds(FILE *fd) {
+int get_number_of_clouds(FILE *fd)
+{
     if (fd == NULL)
     {
         printf("Error, fd does not exist\n");
@@ -462,12 +517,13 @@ int get_number_of_clouds(FILE *fd) {
 
     fseek(fd, 0, SEEK_END);
     uint64_t bytes = ftell(fd);
-    int clouds = bytes / sizeof (CustomHDLCloud);
+    int clouds = bytes / sizeof(CustomHDLCloud);
 
     return clouds;
 }
 
-cloud_t read_cloud_from_file(FILE *fd, int n_cloud) {
+cloud_t read_cloud_from_file(FILE *fd, int n_cloud)
+{
 
     if (fd == NULL)
     {
@@ -481,14 +537,14 @@ cloud_t read_cloud_from_file(FILE *fd, int n_cloud) {
         exit(-1);
     }
 
-    if (fseek(fd, n_cloud * sizeof (CustomHDLCloud), SEEK_SET) != 0)
+    if (fseek(fd, n_cloud * sizeof(CustomHDLCloud), SEEK_SET) != 0)
     {
         printf("Error while moving to cloud %d in velodyne video\n", n_cloud);
         exit(-1);
     }
 
     CustomHDLCloud custom_cloud;
-    if (fread(&custom_cloud, sizeof (CustomHDLCloud), 1, fd) != 1)
+    if (fread(&custom_cloud, sizeof(CustomHDLCloud), 1, fd) != 1)
     {
         printf("Error reading cloud  %d in velodyne video\n", n_cloud);
         exit(-1);
@@ -499,15 +555,16 @@ cloud_t read_cloud_from_file(FILE *fd, int n_cloud) {
     return cloud;
 }
 
-cloud_t convert_custom_cloud(CustomHDLCloud *custom_cloud) {
+cloud_t convert_custom_cloud(CustomHDLCloud *custom_cloud)
+{
     double HDL_FIRING_ELEVATION[] = {-30.67, -9.33, -29.33, -8.00,
-        -28.00, -6.67, -26.67, -5.33,
-        -25.33, -4.00, -24.00, -2.67,
-        -22.67, -1.33, -21.33, 0.00,
-        -20.00, 1.33, -18.67, 2.67,
-        -17.33, 4.00, -16.00, 5.33,
-        -14.67, 6.67, -13.33, 8.00,
-        -12.00, 9.33, -10.67, 10.67};
+                                     -28.00, -6.67, -26.67, -5.33,
+                                     -25.33, -4.00, -24.00, -2.67,
+                                     -22.67, -1.33, -21.33, 0.00,
+                                     -20.00, 1.33, -18.67, 2.67,
+                                     -17.33, 4.00, -16.00, 5.33,
+                                     -14.67, 6.67, -13.33, 8.00,
+                                     -12.00, 9.33, -10.67, 10.67};
 
     cv::Mat cosE(32, 1, CV_64FC1), sinE(32, 1, CV_64FC1);
     for (int i = 0; i < 32; i++)
@@ -520,13 +577,12 @@ cloud_t convert_custom_cloud(CustomHDLCloud *custom_cloud) {
     cv::repeat(cosE, 1, custom_cloud->nValid, cosEM);
     cv::repeat(sinE, 1, custom_cloud->nValid, sinEM);
 
-
     double cosaPre[36000], sinaPre[36000];
     double convFactor = M_PI * 0.01 / 180.0;
     for (int i = 0; i < 36000; i++)
     {
-        cosaPre[i] = cos(convFactor * (double) i);
-        sinaPre[i] = sin(convFactor * (double) i);
+        cosaPre[i] = cos(convFactor * (double)i);
+        sinaPre[i] = sin(convFactor * (double)i);
     }
 
     cv::Mat d(32, custom_cloud->nValid, CV_64FC1);
@@ -534,18 +590,17 @@ cloud_t convert_custom_cloud(CustomHDLCloud *custom_cloud) {
 
     for (uint i = 0; i < custom_cloud->nValid; i++)
     {
-        int azimuthint = (int) custom_cloud->firings[i].azimuth;
+        int azimuthint = (int)custom_cloud->firings[i].azimuth;
         cosA.at<double>(0, i) = cosaPre[azimuthint];
         sinA.at<double>(0, i) = sinaPre[azimuthint];
 
         for (int j = 0; j < HDL_LASER_PER_FIRING; j++)
-            d.at<double>(j, i) = 0.002 * (double) custom_cloud->firings[i].laserReturns[j].distance;
+            d.at<double>(j, i) = 0.002 * (double)custom_cloud->firings[i].laserReturns[j].distance;
     }
 
     cv::Mat cosAM, sinAM;
     cv::repeat(cosA, 32, 1, cosAM);
     cv::repeat(sinA, 32, 1, sinAM);
-
 
     std::vector<cv::Mat> XYZ(3);
     XYZ.at(2) = sinEM.mul(d);
@@ -556,7 +611,6 @@ cloud_t convert_custom_cloud(CustomHDLCloud *custom_cloud) {
     cv::Mat X = XYZ.at(0);
     cv::Mat Y = XYZ.at(1);
     cv::Mat Z = XYZ.at(2);
-
 
     cloud_t cloud;
     cv::Point3f pt;
@@ -573,11 +627,12 @@ cloud_t convert_custom_cloud(CustomHDLCloud *custom_cloud) {
     return cloud;
 }
 
-RadarDetections read_radar_detections(std::string file_name) {
-    FILE *fd = fopen((char *) file_name.c_str(), "r");
+RadarDetections read_radar_detections(std::string file_name)
+{
+    FILE *fd = fopen((char *)file_name.c_str(), "r");
     if (fd == NULL)
     {
-        printf("Error while reading %s\n", (char *) file_name.c_str());
+        printf("Error while reading %s\n", (char *)file_name.c_str());
         exit(-1);
     }
 
@@ -585,24 +640,31 @@ RadarDetections read_radar_detections(std::string file_name) {
     radar_detection_t detection;
     detection.associated_frame = -1;
 
-    while (feof(fd) == 0)
+    fseek(fd, 0, SEEK_END);
+    int size = ftell(fd);
+    if (size != 0)
     {
-        if (fscanf(fd, "%d %d %f %f %f %f %f %d %lu\n", &(detection.obj_n), &(detection.id), &(detection.x), &(detection.y), &(detection.vx), &(detection.vy), &(detection.rcs), &(detection.lt_poe), &(detection.t)) != 9)
+        fseek(fd, 0, SEEK_SET);
+        while (feof(fd) == 0)
         {
-            printf("Error reading file %s\n", (char *) file_name.c_str());
-            exit(-1);
+            if (fscanf(fd, "%d %d %f %f %f %f %f %d %lu\n", &(detection.obj_n), &(detection.id), &(detection.x), &(detection.y), &(detection.vx), &(detection.vy), &(detection.rcs), &(detection.lt_poe), &(detection.t)) != 9)
+            {
+                printf("Error reading file %s\n", (char *)file_name.c_str());
+                exit(-1);
+            }
+            if (!(detection.x == 0 && detection.y == 0 && detection.vx == 0 && detection.vy == 0))
+                radar_detections.push_back(detection);
         }
-        if (!(detection.x == 0 && detection.y == 0 && detection.vx == 0 && detection.vy == 0))
-            radar_detections.push_back(detection);
     }
 
     fclose(fd);
-    printf("Radar detections file %s have been correctly read\n", (char*) file_name.c_str());
+    printf("Radar detections file %s have been correctly read\n", (char *)file_name.c_str());
 
     return radar_detections;
 }
 
-void associate_radar_to_frames(RadarDetections *radar_detections, CameraLog *camera_log) {
+void associate_radar_to_frames(RadarDetections *radar_detections, CameraLog *camera_log)
+{
 
     uint64_t first_time = camera_log->at(0).t_0;
     uint current_radar_index = 0;
@@ -677,7 +739,8 @@ void associate_radar_to_frames(RadarDetections *radar_detections, CameraLog *cam
     *radar_detections = single_detections;
 }
 
-cloud_t get_this_frame_radar_cloud(RadarDetections *detections, int frame, int minTh) {
+cloud_t get_this_frame_radar_cloud(RadarDetections *detections, int frame, int minTh)
+{
 
     cloud_t cloud;
     // create a vector with the detections of this frame
@@ -689,20 +752,22 @@ cloud_t get_this_frame_radar_cloud(RadarDetections *detections, int frame, int m
     return cloud;
 }
 
-void draw_radar_map(cloud_t this_frame_detections) {
+void draw_radar_map(cloud_t this_frame_detections)
+{
     cv::Mat img = cv::Mat::zeros(1000, 400, CV_8UC3);
     float ppm = 10;
 
     for (uint i = 0; i < this_frame_detections.size(); i++)
     {
-        int r = 1000 - (int) this_frame_detections.at(i).x * ppm;
-        int c = 200 - (int) this_frame_detections.at(i).y * ppm;
+        int r = 1000 - (int)this_frame_detections.at(i).x * ppm;
+        int c = 200 - (int)this_frame_detections.at(i).y * ppm;
         cv::circle(img, cv::Point(c, r), 3, cv::Scalar(0, 255, 0));
     }
     cv::imshow("Radar", img);
 }
 
-FullExtrinsicCalibration compute_full_extrinsic_calibrations(cv::Mat l_to_c, cv::Mat l_to_v, cv::Mat r1_to_v, cv::Mat r2_to_v, cv::Mat r3_to_v) {
+FullExtrinsicCalibration compute_full_extrinsic_calibrations(cv::Mat l_to_c, cv::Mat l_to_v, cv::Mat r1_to_v, cv::Mat r2_to_v, cv::Mat r3_to_v)
+{
 
     FullExtrinsicCalibration full_calibration;
 
@@ -738,17 +803,16 @@ FullExtrinsicCalibration compute_full_extrinsic_calibrations(cv::Mat l_to_c, cv:
     full_calibration.from_radar2_to_camera = full_calibration.from_camera_to_radar2.inv();
     full_calibration.from_radar3_to_camera = full_calibration.from_camera_to_radar3.inv();
 
-
     return full_calibration;
 }
 
-cloud_t apply_geometric_transformation(cloud_t cloud, cv::Mat RT) {
+cloud_t apply_geometric_transformation(cloud_t cloud, cv::Mat RT)
+{
 
     cloud_t out_cloud;
 
     cv::Mat pt_i(4, 1, CV_64FC1);
     cv::Mat pt_o(4, 1, CV_64FC1);
-
 
     for (uint i = 0; i < cloud.size(); i++)
     {
@@ -766,7 +830,8 @@ cloud_t apply_geometric_transformation(cloud_t cloud, cv::Mat RT) {
     return out_cloud;
 }
 
-std::vector<cv::Point2d> project_cloud_to_camera(cloud_t cloud, camParams_t camera_parameters) {
+std::vector<cv::Point2d> project_cloud_to_camera(cloud_t cloud, camParams_t camera_parameters)
+{
 
     std::vector<cv::Point2d> img_cloud;
 
@@ -800,32 +865,36 @@ std::vector<cv::Point2d> project_cloud_to_camera(cloud_t cloud, camParams_t came
     return img_cloud;
 }
 
-void draw_img_points(cv::Mat img, std::vector<cv::Point2d> img_pts, cv::Scalar color) {
+void draw_img_points(cv::Mat img, std::vector<cv::Point2d> img_pts, cv::Scalar color)
+{
     for (uint i = 0; i < img_pts.size(); i++)
         cv::circle(img, img_pts.at(i), 1, color, CV_FILLED);
 }
 
-cv::Mat x_axis_rotation_matrix(double ang){
-    cv::Mat RT = cv::Mat::eye(4,4,CV_64FC1);
-    RT.at<double>(1,1) = +cos(ang);
-    RT.at<double>(1,2) = -sin(ang);
-    RT.at<double>(2,1) = +sin(ang);
-    RT.at<double>(2,2) = +cos(ang);
+cv::Mat x_axis_rotation_matrix(double ang)
+{
+    cv::Mat RT = cv::Mat::eye(4, 4, CV_64FC1);
+    RT.at<double>(1, 1) = +cos(ang);
+    RT.at<double>(1, 2) = -sin(ang);
+    RT.at<double>(2, 1) = +sin(ang);
+    RT.at<double>(2, 2) = +cos(ang);
     return RT;
 }
-cv::Mat y_axis_rotation_matrix(double ang){
-    cv::Mat RT = cv::Mat::eye(4,4,CV_64FC1);
-    RT.at<double>(0,0) = +cos(ang);
-    RT.at<double>(0,2) = sin(ang);
-    RT.at<double>(2,0) = -sin(ang);
-    RT.at<double>(2,2) = +cos(ang);
+cv::Mat y_axis_rotation_matrix(double ang)
+{
+    cv::Mat RT = cv::Mat::eye(4, 4, CV_64FC1);
+    RT.at<double>(0, 0) = +cos(ang);
+    RT.at<double>(0, 2) = sin(ang);
+    RT.at<double>(2, 0) = -sin(ang);
+    RT.at<double>(2, 2) = +cos(ang);
     return RT;
 }
-cv::Mat z_axis_rotation_matrix(double ang){
-    cv::Mat RT = cv::Mat::eye(4,4,CV_64FC1);
-    RT.at<double>(0,0) = +cos(ang);
-    RT.at<double>(0,1) = -sin(ang);
-    RT.at<double>(1,0) = +sin(ang);
-    RT.at<double>(1,1) = +cos(ang);
+cv::Mat z_axis_rotation_matrix(double ang)
+{
+    cv::Mat RT = cv::Mat::eye(4, 4, CV_64FC1);
+    RT.at<double>(0, 0) = +cos(ang);
+    RT.at<double>(0, 1) = -sin(ang);
+    RT.at<double>(1, 0) = +sin(ang);
+    RT.at<double>(1, 1) = +cos(ang);
     return RT;
 }
