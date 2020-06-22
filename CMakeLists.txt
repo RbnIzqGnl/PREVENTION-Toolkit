@@ -5,8 +5,12 @@ project(${PROJECT_NAME})
 
 find_package(OpenCV REQUIRED)
 
-MESSAGE ( STATUS " OpenCV libs: " ${OpenCV_LIBS} )
-MESSAGE ( STATUS " OpenCV includes: " ${OpenCV_INCLUDE_DIRS} )
+if(OpenCV_VERSION VERSION_GREATER "3.0")
+    MESSAGE( FATAL_ERROR "OpenCV < 4.0 is REQUIRED" )
+else()
+    MESSAGE ( STATUS " OpenCV libs: " ${OpenCV_LIBS} )
+    MESSAGE ( STATUS " OpenCV includes: " ${OpenCV_INCLUDE_DIRS} )
+endif()
 
 include_directories(${OPENCV_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
